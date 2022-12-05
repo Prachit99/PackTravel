@@ -215,5 +215,3 @@ def attach_user_to_route(username, route_id):
 # Add Edit functionality
 
 # Add Delete functionality
-
-

@@ -77,6 +77,7 @@ function selectRoute(id) {
                 <th scope="col">Duration</th>
                 <th scope="col">Number of users</th>
                 <th scope="col">Details</th>
+                <th scope="col">Modify</th>
               </tr>
             </thead>
             <tbody>
@@ -86,13 +87,15 @@ function selectRoute(id) {
             <tr>
               
               <th scope="row"><div class="input-group">
-                <form method="POST" action="/select_route/" id="myForm{{route.id}}">
+                <form method="POST" action="/select_route/" id="myForm{{route.id}}" name = "selectRoute">
                   {% csrf_token %}
                   <input value="{{ route.id }}" type="hidden" name="hiddenInput">
                   <input type="hidden" value="{{ ride }}" name="hiddenRide">
                   <input type="hidden" value="{{ request.session.username }}" name="hiddenUser">
                 </form>
-                <div class="input-group-prepend">
+                <form method="POST" action="/modify/" name =  "getRow">
+                  {% csrf_token %}
+                  <div class="input-group-prepend">
                   <div class="input-group-text">
                     {% if selectedRoute == route.id %}
                     <input type="radio" onclick='selectRoute("myForm{{route.id}}")' name="routeselect" aria-label="Radio button for following text input" value="{{ route.id }}" id="{{ route.id }}" checked aria-checked="true">
@@ -103,18 +106,22 @@ function selectRoute(id) {
               </div>
             </th>
               <td>
+              
                 {% if ride.type == "Bus" %}
                 <img height="15px" width="15px" src="{% static 'bus.svg'%}">
                 {% elif ride.type == "Cab" %}
                 <img  height="15px" width="15px" src="{% static 'car.svg'%}">
                 {% endif %}
                 {{ route.type }}</td>
-              <td><button type="button" class="btn btn-link" data-toggle="modal" data-target="#myModal">{{ route.spoint }}</button></td>
+              <td><button type="button" class="btn btn-link" data-toggle="modal" data-target="#myModal" name = "routespoint" value="{{ route.spoint }}">{{ route.spoint }}</button></td>
               <td>{{ route.hour }}:{{ route.minute }} {{ route.ampm }}</td>
               <td>{{ route.duration }} minutes</td>
               <td>{{ route.users|length }}</td>
               <td>{{ route.details }}</td>
-
+              
+                
+                <td> <button type="submit" class="btn btn-primary">Modify</button></td>
+              </form>
             </tr>
             <div class="modal" id="myModal">
               <div class="modal-dialog">
