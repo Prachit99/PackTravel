@@ -12,7 +12,7 @@ class Secrets:
 class URLConfig: 
     RoutesHostname=""
     def __init__(self):
-        load_dotenv
+        load_dotenv()
         self.RoutesHostname = os.getenv("ROUTES_HOSTNAME")
 
 
