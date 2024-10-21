@@ -3,9 +3,11 @@ from django.shortcuts import render,redirect
 from numpy import True_, dtype
 import requests
 import json
+from datetime import datetime
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
+
 
 from publish.forms import RideForm
 from utils import get_client
@@ -17,6 +19,13 @@ db = None
 userDB = None
 ridesDB  = None
 routesDB  = None
+
+def has_date_passed(date: str) -> bool: 
+    given_date = datetime.strptime(date, "%Y-%m-%d").date()
+    
+    today = datetime.today().date()
+    
+    return given_date < today
 
 def intializeDB():
     global client, db, userDB, ridesDB, routesDB
@@ -86,13 +95,15 @@ def get_routes(ride):
     if 'route_id' not in ride:
         return None
     route_ids = ride['route_id']
-    for route_id in route_ids:
-        route = routesDB.find_one({'_id': route_id})
-        if not route:
-            pass
-        route['id'] = route["_id"]
-        routes.append(route)
-    return routes
+    documents = routesDB.find({'_id': {'$in': route_ids}})
+    docs = []
+    for doc in documents:
+        doc['id'] = doc["_id"]
+        route_date = doc['id'].split("_")[3]
+        if not has_date_passed(route_date):
+            docs.append(doc)
+            
+    return docs
 
 def create_route(request):
     intializeDB()
