@@ -8,6 +8,19 @@ from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from utils import get_client
 from .forms import RegisterForm, LoginForm
+from google.cloud import storage
+from google.oauth2 import service_account
+
+def upload_to_gcs(file, destination_blob_name):
+    """Uploads a file to Google Cloud Storage."""
+    credentials = service_account.Credentials.from_service_account_file(
+        'credentials.json'
+    )
+    client = storage.Client(credentials=credentials)
+    bucket = client.bucket('pt-user-pfp')
+    blob = bucket.blob(destination_blob_name)
+    blob.upload_from_file(file)
+    return blob.public_url  # Return the public URL of the uploaded file
 
 client = None
 db = None
@@ -56,8 +69,12 @@ def index(request, username=None):
 def register(request):
     intializeDB()
     if request.method == "POST":
-        form = RegisterForm(request.POST)
+        form = RegisterForm(request.POST, request.FILES)
         if form.is_valid():
+            image = form.cleaned_data["profile_picture"]
+            image.name = f"{form.cleaned_data['username']}.png"
+            public_url = upload_to_gcs(image, image.name)
+            print(public_url)
             userObj = {
                 "username": form.cleaned_data["username"],
                 "unityid": form.cleaned_data["unityid"],
@@ -66,7 +83,8 @@ def register(request):
                 "email": form.cleaned_data["email"],
                 "password": form.cleaned_data["password1"],
                 "phone": form.cleaned_data["phone_number"],
-                "rides": []
+                "rides": [],
+                "pfp": public_url
             }
             userDB.insert_one(userObj)
             request.session['username'] = userObj["username"]
@@ -92,6 +110,15 @@ def logout(request):
         pass
     return redirect(index)
 
+def user_profile(request, username):
+    intializeDB()
+    if(not username):
+        return render(request, "user/404.html", {"username": request.session["username"]})
+    profile = userDB.find_one({"username": username})
+    if(profile):
+        return render(request, 'user/profile.html', {"username": request.session["username"], "user": profile})
+    else:
+        return render(request, "user/404.html", {"username": request.session["username"]})
 
 # @describe: Existing user login
 def login(request):

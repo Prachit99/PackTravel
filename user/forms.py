@@ -11,6 +11,7 @@ class RegisterForm(forms.ModelForm):
     email = forms.EmailField(required=True, max_length=60, widget=forms.EmailInput(attrs={'placeholder': 'abc@mail.com', 'class': 'form-control'}))
     password1 = forms.CharField(required=True, widget=forms.PasswordInput(attrs={'placeholder': 'Password','class': "form-control"}))
     phone_number = forms.CharField(required=True, max_length=11, widget=forms.TextInput(attrs={'placeholder': 'Phone Number', 'class': 'form-control'}))
+    profile_picture = forms.ImageField(required=True, widget=forms.FileInput(attrs={'class': 'form-control'}))
 
     class Meta:
         model = User
@@ -22,6 +23,7 @@ class RegisterForm(forms.ModelForm):
             'email',
             'password1',
             'phone_number',
+            'profile_picture'
         )
 
 class LoginForm(forms.ModelForm):

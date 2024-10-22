@@ -17,7 +17,7 @@
     <div class="card mx-auto shadow-2-strong bg-white rounded" style="width: 60%; margin: 50px; padding: 50px;">
         <h3>Register Here</h3>
         <hr>
-        <form method="POST" class="form-group">
+        <form method="POST" class="form-group" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form-group">
                 <label for="id_username">Username</label>
@@ -47,6 +47,13 @@
             <div class="form-group">
                 <label for="id_username">Phone Number</label>
                 {{form.phone_number}}
+            </div>
+            <br>
+
+            <br>
+            <div class="form-group">
+                <label for="id_username">Profile Picture</label>
+                {{form.profile_picture}}
             </div>
             <br>
             
