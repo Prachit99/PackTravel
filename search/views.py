@@ -9,12 +9,14 @@ from django.contrib.auth.forms import UserCreationForm
 
 from publish.forms import RideForm
 from utils import get_client
+from config import Secrets
 
 client = None
 db = None
 userDB = None
 ridesDB  = None
 routesDB  = None
+secrets = Secrets()
 
 def intializeDB():
     global client, db, userDB, ridesDB, routesDB
@@ -40,4 +42,4 @@ def search_index(request):
                 ride.update(route)
         ride['id'] = ride.pop('_id')
         processed.append(ride)
-    return render(request, 'search/search.html', {"username": request.session['username'], "rides": processed})
+    return render(request, 'search/search.html', {"username": request.session['username'], "rides": processed, "gmap_api_key": secrets.GoogleMapsAPIKey})
