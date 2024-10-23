@@ -17,7 +17,7 @@ def upload_to_gcs(file, destination_blob_name):
         'credentials.json'
     )
     client = storage.Client(credentials=credentials)
-    bucket = client.bucket('pt-user-pfp')
+    bucket = client.bucket('ptravel-pfp')
     blob = bucket.blob(destination_blob_name)
     blob.upload_from_file(file)
     return blob.public_url  # Return the public URL of the uploaded file
