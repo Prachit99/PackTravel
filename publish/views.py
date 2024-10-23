@@ -6,6 +6,8 @@ import json
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
+from services import MapsService
+from config import Secrets, URLConfig
 
 from publish.forms import RideForm
 from utils import get_client
@@ -17,6 +19,10 @@ db = None
 userDB = None
 ridesDB  = None
 routesDB  = None
+mapsService = None
+
+secrets = Secrets()
+urlConfig = URLConfig()
 
 def intializeDB():
     global client, db, userDB, ridesDB, routesDB
@@ -26,12 +32,16 @@ def intializeDB():
     ridesDB  = db.rides
     routesDB  = db.routes
 
+def initializeService():
+    global mapsService
+    mapsService = MapsService(urlConfig.RoutesHostname, secrets.GoogleMapsAPIKey)
+
 def publish_index(request):
     intializeDB()
     if not request.session.has_key('username'):
         request.session['alert'] = "Please login to create a ride."
         return redirect('index')
-    return render(request, 'publish/publish.html', {"username": request.session['username'], "alert":True})
+    return render(request, 'publish/publish.html', {"username": request.session['username'], "alert":True, "gmap_api_key": secrets.GoogleMapsAPIKey})
 
 def display_ride(request, ride_id):
     intializeDB()
@@ -62,7 +72,7 @@ def select_route(request):
         ride_id = ride['_id']
         attach_user_to_route(username, route_id)
         return redirect(display_ride, ride_id=ride['_id'] )
-    return render(request, 'publish/publish.html', {"username": username})
+    return render(request, 'publish/publish.html', {"username": username, "gmap_api_key": secrets.GoogleMapsAPIKey})
 
 
 def routeSelect(username, routes):
@@ -96,22 +106,35 @@ def get_routes(ride):
 
 def create_route(request):
     intializeDB()
+    initializeService()
     if request.method == 'POST':
         route = {
             "_id":
                 f"""{request.POST.get('purpose')}_{request.POST.get('s_point')}_{request.POST.get('destination')}_{request.POST.get("date")}_{request.POST.get("hour")}_{request.POST.get("minute")}_{request.POST.get("ampm")}""",
                 "purpose": request.POST.get('purpose'),
-                "s_point": request.POST.get('s_point'),
+                "s_point": request.POST.get('spoint'),
                 "destination": request.POST.get('destination'),
                 "type": request.POST.get('type'),
                 "date": request.POST.get("date"),
                 "hour": request.POST.get("hour"),
                 "minute":  request.POST.get("minute"),
                 "ampm": request.POST.get("ampm"),
-                "details": request.POST.get("details")
+                "details": request.POST.get("details"),
             }
         ride_id = request.POST.get('destination')
         attach_user_to_route(request.session['username'], route['_id'])
+        if(request.POST.get("slat")):
+            route["s_lat"] = request.POST.get("slat")
+            route["s_long"] = request.POST.get("slong")
+        if(request.POST.get("dlat")):
+            route["d_lat"] = request.POST.get("dlat")
+            route["d_long"] = request.POST.get("dlong")
+
+        if(request.POST.get("dlat") and request.POST.get("slat")):
+            res = mapsService.get_route_details(route["s_lat"], route["s_long"], route["d_lat"], route["d_long"])
+            route['fuel'] = res.get("fuel", 0)
+            route["distance"] = res.get("distance", 0)
+
         if routesDB.find_one({'_id': route['_id']}) == None:
             routesDB.insert_one(route)
             print("Route added")
@@ -130,7 +153,7 @@ def create_route(request):
                 ridesDB.update_one({'_id': ride_id},{"$set": {"route_id": ride['route_id']}})
                 print("Ride Updated")
         return redirect(display_ride, ride_id=ride_id)
-    return render(request, 'publish/publish.html', {"username": request.session['username']})
+    return render(request, 'publish/publish.html', {"username": request.session['username'], "gmap_api_key": secrets.GoogleMapsAPIKey})
 
 # def add_route(request):
 #     intializeDB()
