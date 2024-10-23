@@ -10,7 +10,7 @@ class Routes:
 
     def __get_route_details__(self, slat: str, slong: str, dlat: str, dlong: str):
         try: 
-            conn = client.HTTPSConnection(self.hostname)
+            conn = client.HTTPSConnection(self.hostname, timeout=1)
             payload = json.dumps({
                 "origin": {
                     "location": {
@@ -46,7 +46,6 @@ class Routes:
                 'X-Goog-Api-Key': self.api_key,
                 'X-Goog-FieldMask': 'routes.distanceMeters,routes.duration,routes.routeLabels,routes.routeToken,routes.travelAdvisory.fuelConsumptionMicroliters'
             }
-
             conn.request("POST", "/directions/v2:computeRoutes", payload, headers)
             res = conn.getresponse()
             data = res.read()
