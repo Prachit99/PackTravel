@@ -98,6 +98,9 @@ def get_routes(ride):
     route_ids = ride['route_id']
     for route_id in route_ids:
         route = routesDB.find_one({'_id': route_id})
+        user = userDB.find_one({"_id": route['creator'] })
+        user['id'] = user['_id']
+        route['creator'] = user
         if not route:
             pass
         # route['id'] = route.pop('_id')

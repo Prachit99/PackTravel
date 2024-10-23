@@ -85,13 +85,14 @@ def register(request):
                 "rides": [],
                 "pfp": public_url
             }
-            userDB.insert_one(userObj)
+            savedUser = userDB.insert_one(userObj)
             request.session['username'] = userObj["username"]
             request.session['unityid'] = userObj["unityid"]
             request.session['fname'] = userObj["fname"]
             request.session['lname'] = userObj["lname"]
             request.session['email'] = userObj["email"]
             request.session['phone'] = userObj["phone"]
+            request.session['userid'] = str(savedUser.inserted_id)
             return redirect(index, username=request.session["username"])
         else:
             print(form.errors.as_data())
