@@ -8,26 +8,24 @@ from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from utils import get_client
 from .forms import RegisterForm, LoginForm
-from google.cloud import storage
-from google.oauth2 import service_account
-
-def upload_to_gcs(file, destination_blob_name):
-    """Uploads a file to Google Cloud Storage."""
-    credentials = service_account.Credentials.from_service_account_file(
-        'credentials.json'
-    )
-    client = storage.Client(credentials=credentials)
-    bucket = client.bucket('ptravel-pfp')
-    blob = bucket.blob(destination_blob_name)
-    blob.upload_from_file(file)
-    return blob.public_url  # Return the public URL of the uploaded file
+from services import GoogleCloud
+from config import Secrets
 
 client = None
 db = None
 userDB = None
 ridesDB = None
 routesDB = None
+googleCloud = None
+secrets = None
 
+def initializeCloud():
+    global googleCloud, secrets
+    if not secrets:
+        secrets = Secrets()
+    
+    if not googleCloud:
+        googleCloud = GoogleCloud(secrets.CloudCredentials, secrets.CloudStorageBucket)
 
 def intializeDB():
     global client, db, userDB, ridesDB, routesDB
@@ -68,13 +66,13 @@ def index(request, username=None):
 
 def register(request):
     intializeDB()
+    initializeCloud()
     if request.method == "POST":
         form = RegisterForm(request.POST, request.FILES)
         if form.is_valid():
             image = form.cleaned_data["profile_picture"]
             image.name = f"{form.cleaned_data['username']}.png"
-            public_url = upload_to_gcs(image, image.name)
-            print(public_url)
+            public_url = googleCloud.upload_file(image, image.name)
             userObj = {
                 "username": form.cleaned_data["username"],
                 "unityid": form.cleaned_data["unityid"],
