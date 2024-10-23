@@ -126,7 +126,7 @@ def create_route(request):
                 "details": request.POST.get("details"),
             }
         ride_id = request.POST.get('destination')
-        attach_user_to_route(request.session['username'], route['_id'])
+        route['creator'] = attach_user_to_route(request.session['username'], route['_id'])
         if(request.POST.get("slat")):
             route["s_lat"] = request.POST.get("slat")
             route["s_long"] = request.POST.get("slong")
@@ -210,7 +210,7 @@ def attach_user_to_route(username, route_id):
 
     user['rides'].append(route_id)
     userDB.update_one({"username": username},{"$set": {"rides": user['rides']}})
-    print("route added for user")
+    return user['_id']
 
     # rides = user['rides']
     # #remove other routes for this user and ride

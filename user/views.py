@@ -10,6 +10,7 @@ from utils import get_client
 from .forms import RegisterForm, LoginForm
 from services import GoogleCloud
 from config import Secrets
+from bson.objectid import ObjectId
 
 client = None
 db = None
@@ -108,11 +109,11 @@ def logout(request):
         pass
     return redirect(index)
 
-def user_profile(request, username):
+def user_profile(request, userid):
     intializeDB()
-    if(not username):
+    if(not userid):
         return render(request, "user/404.html", {"username": request.session["username"]})
-    profile = userDB.find_one({"username": username})
+    profile = userDB.find_one({"_id": ObjectId(userid)})
     if(profile):
         return render(request, 'user/profile.html', {"username": request.session["username"], "user": profile})
     else:
@@ -132,6 +133,7 @@ def login(request):
                 user = userDB.find_one({"username": username})
 
                 if user and user["password"] == form.cleaned_data["password"]:
+                    request.session['userid'] = str(user['_id'])
                     request.session["username"] = username
                     request.session['unityid'] = user["unityid"]
                     request.session['fname'] = user["fname"]
