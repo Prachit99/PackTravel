@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from utils import get_client
+import re
 
 userDB = None
 
@@ -11,8 +12,14 @@ def intializeDB():
         userDB = db.userData
 
 def validate_email_domain(value):
+    pattern = re.compile("^[a-zA-Z0-9]+$")
     allowed_domain = 'ncsu.edu'
-    domain = value.split('@')[-1]
+    email_parts = value.split('@')
+    domain = email_parts[-1]
+    if len(email_parts) != 2:
+        raise ValidationError(f"Invalid email")
+    if not pattern.match(email_parts[0]):
+        raise ValidationError(f"Invalid email")
     if domain != allowed_domain:
         raise ValidationError(f"Email must be from the {allowed_domain} domain.")
     
