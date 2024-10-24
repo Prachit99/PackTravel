@@ -1,16 +1,10 @@
-from http.client import HTTPResponse
 from django.shortcuts import render, redirect
-import requests
-import json
-from django.http import HttpResponse
-from django.contrib.auth import login, authenticate
-from django.contrib import messages
-from django.contrib.auth.forms import UserCreationForm
 from utils import get_client
 from .forms import RegisterForm, LoginForm
 from services import GoogleCloud
 from config import Secrets
 from bson.objectid import ObjectId
+from django.forms.utils import ErrorList
 
 client = None
 db = None
@@ -71,31 +65,34 @@ def register(request):
     if request.method == "POST":
         form = RegisterForm(request.POST, request.FILES)
         if form.is_valid():
-            image = form.cleaned_data["profile_picture"]
-            image.name = f"{form.cleaned_data['username']}.png"
-            public_url = googleCloud.upload_file(image, image.name)
-            userObj = {
-                "username": form.cleaned_data["username"],
-                "unityid": form.cleaned_data["unityid"],
-                "fname": form.cleaned_data["first_name"],
-                "lname": form.cleaned_data["last_name"],
-                "email": form.cleaned_data["email"],
-                "password": form.cleaned_data["password1"],
-                "phone": form.cleaned_data["phone_number"],
-                "rides": [],
-                "pfp": public_url
-            }
-            savedUser = userDB.insert_one(userObj)
-            request.session['username'] = userObj["username"]
-            request.session['unityid'] = userObj["unityid"]
-            request.session['fname'] = userObj["fname"]
-            request.session['lname'] = userObj["lname"]
-            request.session['email'] = userObj["email"]
-            request.session['phone'] = userObj["phone"]
-            request.session['userid'] = str(savedUser.inserted_id)
-            return redirect(index, username=request.session["username"])
-        else:
-            print(form.errors.as_data())
+            unity_user = userDB.find_one({"unityid": form.cleaned_data["unityid"]})
+            if not unity_user :
+                image = form.cleaned_data["profile_picture"]
+                image.name = f"{form.cleaned_data['username']}.png"
+                public_url = googleCloud.upload_file(image, image.name)
+                userObj = {
+                    "username": form.cleaned_data["username"],
+                    "unityid": form.cleaned_data["unityid"],
+                    "fname": form.cleaned_data["first_name"],
+                    "lname": form.cleaned_data["last_name"],
+                    "email": form.cleaned_data["email"],
+                    "password": form.cleaned_data["password1"],
+                    "phone": form.cleaned_data["phone_number"],
+                    "rides": [],
+                    "pfp": public_url
+                }
+                savedUser = userDB.insert_one(userObj)
+                request.session['username'] = userObj["username"]
+                request.session['unityid'] = userObj["unityid"]
+                request.session['fname'] = userObj["fname"]
+                request.session['lname'] = userObj["lname"]
+                request.session['email'] = userObj["email"]
+                request.session['phone'] = userObj["phone"]
+                request.session['userid'] = str(savedUser.inserted_id)
+                return redirect(index, username=request.session["username"])
+            else: 
+                errors = form._errors.setdefault("unityid", ErrorList())
+                errors.append("Unity ID must be unique")
     else:
         if request.session.has_key('username'):
             return index(request, request.session['username'])
