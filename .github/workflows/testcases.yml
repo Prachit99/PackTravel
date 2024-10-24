@@ -21,6 +21,7 @@ jobs:
       - run: cd packTravel
       - run: virtualenv newenv
       - run: source newenv/bin/activate
+      - run: pip3 install python-dotenv
       - run: pip3 install setuptools
       - run: python3 -m ensurepip --upgrade
       - run: sudo apt install python3-distutils
