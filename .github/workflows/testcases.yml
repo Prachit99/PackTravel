@@ -17,7 +17,7 @@ jobs:
       - run: virtualenv newenv
       - run: source newenv/bin/activate
       - run: pip install setuptools
-      - run: sudo apt install python3.7-distutils
+      - run: sudo apt install python3-distutils
       - run: pip3 install -r requirements.txt
       - run: pip3 install django
       - run: pip3 install django-allauth
