@@ -4,6 +4,8 @@ on: [pull_request, push]
 jobs:
   test_python:
     runs-on: ubuntu-latest
+    env:
+      MONGO_CONNECTION_URL: ${{secrets.MONGO_CONNECTION_URL}}
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10"]
