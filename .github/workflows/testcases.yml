@@ -16,7 +16,7 @@ jobs:
       - run: cd packTravel
       - run: virtualenv newenv
       - run: source newenv/bin/activate
-      - run: pip install setuptools
+      - run: pip3 install setuptools
       - run: sudo apt install python3-distutils
       - run: pip3 install -r requirements.txt
       - run: pip3 install django
