@@ -12,7 +12,7 @@ class RegisterForm(forms.ModelForm):
     email = forms.EmailField(required=True, validators= [validate_email_domain], max_length=60, widget=forms.EmailInput(attrs={'placeholder': 'abc@ncsu.edu', 'class': 'form-control'}))
     password1 = forms.CharField(required=True, widget=forms.PasswordInput(attrs={'placeholder': 'Password','class': "form-control"}))
     phone_number = forms.CharField(required=True, max_length=11, widget=forms.TextInput(attrs={'placeholder': 'Phone Number', 'class': 'form-control'}))
-    profile_picture = forms.ImageField(required=True, widget=forms.FileInput(attrs={'class': 'form-control'}))
+    profile_picture = forms.ImageField(required=False, widget=forms.FileInput(attrs={'class': 'form-control'}))
 
     class Meta:
         model = User
