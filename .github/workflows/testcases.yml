@@ -1,5 +1,6 @@
 name: run test cases
 on: [pull_request, push]
+
 jobs:
   test_python:
     runs-on: ubuntu-latest
@@ -16,7 +17,7 @@ jobs:
       - run: virtualenv newenv
       - run: source newenv/bin/activate
       - run: pip install setuptools
-      - run: sudo apt install python3-distutils
+      - run: sudo apt install python3.7-distutils
       - run: pip3 install -r requirements.txt
       - run: pip3 install django
       - run: pip3 install django-allauth
@@ -25,5 +26,7 @@ jobs:
       - run: pip3 install coverage
       - run: coverage run ./manage.py test
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2
+      - name: Upload results to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
