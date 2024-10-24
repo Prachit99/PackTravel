@@ -1,8 +1,22 @@
-from ..validators import validate_email_domain
+from ..validators import validate_email_domain, validate_unique_unity_id
 from django.test import SimpleTestCase
 from django.core.exceptions import ValidationError
 
-class UserValidationTests(SimpleTestCase):
+class UserUnityIDValidationTests(SimpleTestCase):
+    def test_valid_unity_id(self):
+        unityid = "testunityid"
+        try:
+            validate_unique_unity_id(unityid)
+        except ValidationError:
+            self.fail("Raised validation error on a valid unityid")
+
+    def test_invalid_unity_id(self):
+        unityid = "kl"
+        with self.assertRaises(ValidationError):
+            validate_unique_unity_id(unityid)
+            
+
+class UserEmailValidationTests(SimpleTestCase):
     def test_valid_email(self):
         email = "student@ncsu.edu"
         try:
