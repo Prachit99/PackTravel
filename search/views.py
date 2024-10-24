@@ -1,27 +1,22 @@
 from http.client import HTTPResponse
 from django.shortcuts import render,redirect
 from numpy import True_, dtype
-from datetime import datetime
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
+from utilities import DateUtils
 
 from publish.forms import RideForm
 from utils import get_client
+from config import Secrets
 
 client = None
 db = None
 userDB = None
 ridesDB  = None
 routesDB  = None
+secrets = Secrets()
 
-def has_date_passed(date: str) -> bool: 
-    given_date = datetime.strptime(date, "%Y-%m-%d").date()
-    
-    today = datetime.today().date()
-    
-    return given_date < today
-    
 def intializeDB():
     global client, db, userDB, ridesDB, routesDB
     client = get_client()
@@ -42,9 +37,9 @@ def search_index(request):
         routes = ride['route_id']
         for route in routes:
             route_date = route.split("_")[3]
-            if not has_date_passed(route_date):
+            if not DateUtils.has_date_passed(route_date):
                 route_count += 1
         ride['id'] = ride.pop('_id')
         ride['count'] = route_count
         processed.append(ride)
-    return render(request, 'search/search.html', {"username": request.session['username'], "rides": processed})
+    return render(request, 'search/search.html', {"username": request.session['username'], "rides": processed, "gmap_api_key": secrets.GoogleMapsAPIKey})

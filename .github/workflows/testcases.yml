@@ -1,17 +1,30 @@
 name: run test cases
 on: [pull_request, push]
+
 jobs:
   test_python:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10"]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
       - uses: actions/checkout@v3
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: python3 --version
       - run: pip3 install virtualenv
       - run: mkdir packTravel
       - run: cd packTravel
       - run: virtualenv newenv
       - run: source newenv/bin/activate
+      - run: pip3 install python-dotenv
+      - run: pip3 install setuptools
+      - run: python3 -m ensurepip --upgrade
+      - run: sudo apt install python3-distutils
       - run: pip3 install -r requirements.txt
       - run: pip3 install django
       - run: pip3 install django-allauth
@@ -20,5 +33,7 @@ jobs:
       - run: pip3 install coverage
       - run: coverage run ./manage.py test
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2
+      - name: Upload results to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

@@ -17,7 +17,7 @@
     <div class="card mx-auto shadow-2-strong bg-white rounded" style="width: 60%; margin: 50px; padding: 50px;">
         <h3>Register Here</h3>
         <hr>
-        <form method="POST" class="form-group">
+        <form method="POST" class="form-group" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form-group">
                 <label for="id_username">Username</label>
@@ -49,11 +49,30 @@
                 {{form.phone_number}}
             </div>
             <br>
+
+            <br>
+            <div class="form-group">
+                <label for="id_username">Profile Picture</label>
+                {{form.profile_picture}}
+            </div>
+            <br>
             
             <div class="form-group">
                 <label for="id_password">Password</label>
                 {{form.password1}}
             </div>
+            <br>
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
             <br>
             <button type="submit" style="color: white; background-color: #D22B2B; border-color: #D22B2B;" class="btn btn-dark" >Register on PackTravel</button>
             <br>

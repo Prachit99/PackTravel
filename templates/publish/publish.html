@@ -8,6 +8,38 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{gmap_api_key}}&libraries=places"></script>
+    <script>
+        function initAutocomplete() {
+        // Get the input element
+            const input = document.getElementById('acinput1');
+            const slat = document.getElementById("slat");
+            const slong = document.getElementById("slong");
+
+            const input2 = document.getElementById('acinput2');
+            const dlat = document.getElementById("dlat");
+            const dlong = document.getElementById("dlong");
+
+            // Initialize the autocomplete object
+            const autocomplete = new google.maps.places.Autocomplete(input);
+            const autocomplete2 = new google.maps.places.Autocomplete(input2);
+
+            // Add a listener for when a place is selected
+            autocomplete.addListener('place_changed', function() {
+                const place1 = autocomplete.getPlace();
+                slat.value = place1.geometry.location.lat();
+                slong.value = place1.geometry.location.lng();
+            });
+
+            autocomplete2.addListener('place_changed', function() {
+                const place2 = autocomplete2.getPlace();
+                dlat.value = place2.geometry.location.lat();
+                dlong.value = place2.geometry.location.lng();
+            });
+        }
+        
+        google.maps.event.addDomListener(window, 'load', initAutocomplete);
+    </script>
 	<link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet">
 </head>
 
@@ -26,7 +58,9 @@
                 <div class="col-sm-6">
                     <div class="form-group">
                         <span class="form-label">Starting Point</span>
-                        <input name="spoint" required class="form-control" type="text" placeholder="Enter your starting point for the ride">
+                        <input id="acinput1" name="spoint" required class="form-control" type="text" placeholder="Enter your starting point for the ride">
+                        <input type="hidden" id="slat" name="slat" value="">
+                        <input type="hidden" id="slong" name="slong" value="">
                     </div>
                 </div>
                 <br>
@@ -36,7 +70,9 @@
                 <div class="col-sm-6">
                     <div class="form-group">
                         <span class="form-label">Destination</span>
-                        <input name="destination" required class="form-control" type="text" placeholder="Enter your destination for the ride">
+                        <input id="acinput2" name="destination" required class="form-control" type="text" placeholder="Enter your destination for the ride">
+                        <input type="hidden" id="dlat" name="dlat" value="">
+                        <input type="hidden" id="dlong" name="dlong" value="">
                     </div>
                 </div>
                 <br>

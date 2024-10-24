@@ -1,9 +1,13 @@
 from django.test import SimpleTestCase
 from django.urls import reverse, resolve
-from user.views import index, register, logout, login
+from user.views import index, register, logout, login, user_profile, my_rides
 
 
 class TestUrl(SimpleTestCase):
+
+    def test_search_resolved(self):
+        url = reverse("search")
+        self.assertEquals(resolve(url).func, my_rides)
 
     def test_index_resolved(self):
         url = reverse('index')
@@ -19,5 +23,10 @@ class TestUrl(SimpleTestCase):
 
     def test_logout_resolved(self):
         url = reverse('logout')
+        
         self.assertEquals(resolve(url).func, logout)
+
+    def test_profile_resolved(self):
+        url = reverse('user_profile', args=["123"])
+        self.assertEquals(resolve(url).func, user_profile)
 
