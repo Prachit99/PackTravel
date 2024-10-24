@@ -63,13 +63,15 @@
             </div>
             <br>
             {% if form.errors %}
-                <ul>
-                {% for field in form %}
-                    {% for error in field.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                {% endfor %}
-                </ul>
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
             {% endif %}
             <br>
             <button type="submit" style="color: white; background-color: #D22B2B; border-color: #D22B2B;" class="btn btn-dark" >Register on PackTravel</button>
