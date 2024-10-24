@@ -1,5 +1,8 @@
 name: run test cases
-on: [pull_request, push]
+runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10"]
 jobs:
   test_python:
     runs-on: ubuntu-latest
@@ -12,6 +15,8 @@ jobs:
       - run: cd packTravel
       - run: virtualenv newenv
       - run: source newenv/bin/activate
+      - run: pip install setuptools
+      - run: sudo apt install python3.7-distutils
       - run: pip3 install -r requirements.txt
       - run: pip3 install django
       - run: pip3 install django-allauth
