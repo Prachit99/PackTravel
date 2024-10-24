@@ -1,6 +1,6 @@
 from django.test import SimpleTestCase
 from django.urls import reverse, resolve
-from user.views import index, register, logout, login
+from user.views import index, register, logout, login, user_profile
 
 
 class TestUrl(SimpleTestCase):
@@ -20,4 +20,8 @@ class TestUrl(SimpleTestCase):
     def test_logout_resolved(self):
         url = reverse('logout')
         self.assertEquals(resolve(url).func, logout)
+
+    def test_profile_resolved(self):
+        url = reverse('/u/12')
+        self.assertEquals(resolve(url).func, user_profile)
 
