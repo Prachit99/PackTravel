@@ -98,6 +98,9 @@ def get_routes(ride):
     route_ids = ride['route_id']
     for route_id in route_ids:
         route = routesDB.find_one({'_id': route_id})
+        user = userDB.find_one({"_id": route['creator'] })
+        user['id'] = user['_id']
+        route['creator'] = user
         if not route:
             pass
         route['id'] = route["_id"]
@@ -122,7 +125,7 @@ def create_route(request):
                 "details": request.POST.get("details"),
             }
         ride_id = request.POST.get('destination')
-        attach_user_to_route(request.session['username'], route['_id'])
+        route['creator'] = attach_user_to_route(request.session['username'], route['_id'])
         if(request.POST.get("slat")):
             route["s_lat"] = request.POST.get("slat")
             route["s_long"] = request.POST.get("slong")
@@ -206,7 +209,7 @@ def attach_user_to_route(username, route_id):
 
     user['rides'].append(route_id)
     userDB.update_one({"username": username},{"$set": {"rides": user['rides']}})
-    print("route added for user")
+    return user['_id']
 
     # rides = user['rides']
     # #remove other routes for this user and ride
