@@ -1,11 +1,10 @@
 from http.client import HTTPResponse
 from django.shortcuts import render,redirect
 from numpy import True_, dtype
-import requests
-import json
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
+from utils import DateUtils
 
 from publish.forms import RideForm
 from utils import get_client
@@ -36,10 +35,13 @@ def search_index(request):
     processed, routes = list(), list()
     processed_routes = list()
     for ride in all_rides:
+        route_count = 0
         routes = ride['route_id']
-        for route in all_routes:
-            if route['_id'] in routes:
-                ride.update(route)
+        for route in routes:
+            route_date = route.split("_")[3]
+            if not DateUtils.has_date_passed(route_date):
+                route_count += 1
         ride['id'] = ride.pop('_id')
+        ride['count'] = route_count
         processed.append(ride)
     return render(request, 'search/search.html', {"username": request.session['username'], "rides": processed, "gmap_api_key": secrets.GoogleMapsAPIKey})

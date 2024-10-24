@@ -100,7 +100,7 @@ def get_routes(ride):
         route = routesDB.find_one({'_id': route_id})
         if not route:
             pass
-        # route['id'] = route.pop('_id')
+        route['id'] = route["_id"]
         routes.append(route)
     return routes
 
@@ -110,11 +110,7 @@ def create_route(request):
     if request.method == 'POST':
         route = {
             "_id":
-                f"""{request.POST.get('purpose')}_{request.POST.get('s_point')}_{request.POST.get('destination')}
-                _{request.POST.get("date")}_{request.POST.get("hour")}_{request.POST.get("minute")}
-                _{request.POST.get("ampm")}"""
-
-            ,
+                f"""{request.POST.get('purpose')}_{request.POST.get('s_point')}_{request.POST.get('destination')}_{request.POST.get("date")}_{request.POST.get("hour")}_{request.POST.get("minute")}_{request.POST.get("ampm")}""",
                 "purpose": request.POST.get('purpose'),
                 "s_point": request.POST.get('spoint'),
                 "destination": request.POST.get('destination'),
