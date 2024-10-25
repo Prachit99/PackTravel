@@ -31,9 +31,7 @@ def search_index(request):
         request.session['alert'] = "Please login to create a ride."
         return redirect('index')
     all_rides = list(ridesDB.find())
-    all_routes = list(routesDB.find())
     processed, routes = list(), list()
-    processed_routes = list()
     for ride in all_rides:
         route_count = 0
         routes = ride['route_id']

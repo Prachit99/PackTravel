@@ -90,7 +90,7 @@
             <br>
             <div class="form-group">
                 <span class="form-label">Journey Date</span>
-                <input class="form-control" name="date" type="date" required placeholder="Enter journey date">
+                <input id="journeyDate" class="form-control" name="date" type="date" required placeholder="Enter journey date">
             </div>
             <br>
             <div class="form-group">
@@ -177,7 +177,44 @@
         </form>
 </div>
 
+<script>
+    // JavaScript to dynamically set the min and max attributes
+    const dateInput = document.getElementById('journeyDate');
+    const today = new Date();
     
+    // Set minimum date to tomorrow
+    const minDate = new Date(today);
+    minDate.setDate(today.getDate() + 1);
+    
+    // Set maximum date to 30 days from today
+    const maxDate = new Date(today);
+    maxDate.setDate(today.getDate() + 30);
+
+    // Format dates as YYYY-MM-DD
+    const formatDate = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    dateInput.setAttribute('min', formatDate(minDate));
+    dateInput.setAttribute('max', formatDate(maxDate));
+    dateInput.oninvalid = function(event) {
+        if (this.value < this.min) {
+            this.setCustomValidity(`Please select a date no earlier than tomorrow.`);
+        } else if (this.value > this.max) {
+            this.setCustomValidity(`Please select a date no later than 30 days from today.`);
+        } else {
+            this.setCustomValidity(''); // Clear any other invalid states
+        }
+    };
+
+    // Clear custom validation message on input
+    dateInput.oninput = function(event) {
+        this.setCustomValidity('');
+    };
+</script>
 
 </body>
 

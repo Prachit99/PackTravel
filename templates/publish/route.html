@@ -85,9 +85,9 @@ function selectRoute(id) {
               </div>
             </th>
               <td>
-                {% if ride.type == "Bus" %}
+                {% if route.type == "Bus" %}
                 <img height="15px" width="15px" src="{% static 'bus.svg'%}">
-                {% elif ride.type == "Cab" %}
+                {% elif route.type == "Cab" %}
                 <img  height="15px" width="15px" src="{% static 'car.svg'%}">
                 {% endif %}
                 {{ route.type }}
