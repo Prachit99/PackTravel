@@ -168,13 +168,14 @@ def delete_ride(request, ride_id):
     routesDB.delete_one({"_id": ride_id})
     return redirect("/myrides")
 
+
 def edit_user(request):
     intializeDB() 
     initializeCloud() 
     user = userDB.find_one({"username": request.session['username']}) 
 
     if request.method == 'POST':
-        form = EditUserForm(request.POST, request.FILES, instance=user)  
+        form = EditUserForm(request.POST, request.FILES)  
         if form.is_valid():
             image = form.cleaned_data.get("profile_picture") 
             if image: 
